@@ -1,0 +1,10 @@
+pub const TITLE: &str = "h1";
+pub const SUBTITLE: &str = "h2";
+pub const COVER_IMAGE: &str = "div.font-sans img";
+pub const AUTHOR_BLOCK: &str = "div.m-2.mt-5";
+pub const AUTHOR_LINK: &str = ".flex-grow a[href*=\"medium.com/@\"]";
+pub const AUTHOR_IMAGE: &str = "img.rounded-full";
+pub const META_BLOCK: &str = "div.px-4.pb-2 > div.flex";
+pub const META_SPAN: &str = "span";
+pub const CONTENT: &str = "div.mt-8.main-content";
+pub const TAG_LINK: &str = "a[href*=\"/tag/\"]";

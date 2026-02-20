@@ -1,0 +1,43 @@
+[package]
+name = "freedium-tray"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["you"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "freedium_tray_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["macos-private-api", "tray-icon"] }
+tauri-plugin-opener = "2"
+tauri-plugin-store = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1.0.101"
+tauri-plugin-http = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-dialog = "2"
+reqwest = { version = "0.12", features = ["blocking"] }
+tokio = { version = "1", features = ["rt-multi-thread"] }
+scraper = "0.25.0"
+markup5ever = "0.36.1"
+rusqlite = { version = "0.38.0", features = ["bundled"] }
+r2d2 = "0.8"
+r2d2_sqlite = "0.32"
+regex = "1"
+url = "2.5.8"
+chrono = "0.4"
+dirs = "6"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-positioner = { version = "2.0.0", features = ["tray-icon"] }
