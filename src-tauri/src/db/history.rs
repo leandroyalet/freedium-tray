@@ -77,8 +77,12 @@ pub fn add_to_history(conn: &Connection, article_url: &str) -> Result<i64, rusql
     }
 }
 
-pub fn get_reading_history(conn: &Connection) -> Result<Vec<HistoryEntryData>, rusqlite::Error> {
-    let mut stmt = conn.prepare(
+pub fn get_reading_history(
+    conn: &Connection,
+    limit: i64,
+    offset: i64,
+) -> Result<Vec<HistoryEntryData>, rusqlite::Error> {
+    let mut sql = String::from(
         "
             SELECT 
                 h.id,
@@ -90,7 +94,13 @@ pub fn get_reading_history(conn: &Connection) -> Result<Vec<HistoryEntryData>, r
             JOIN articles a ON a.id = h.article_id
             ORDER BY h.visited_at DESC
             ",
-    )?;
+    );
+
+    if limit >= 0 {
+        sql.push_str(&format!(" LIMIT {} OFFSET {}", limit, offset));
+    }
+
+    let mut stmt = conn.prepare(&sql)?;
 
     let rows = stmt.query_map([], map_history_row)?;
 

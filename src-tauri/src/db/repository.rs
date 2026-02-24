@@ -100,8 +100,12 @@ impl Repository {
         self.with_conn(|conn| history::add_to_history(conn, article_url))
     }
 
-    pub fn get_reading_history(&self) -> Result<Vec<history::HistoryEntryData>, String> {
-        self.with_conn(history::get_reading_history)
+    pub fn get_reading_history(
+        &self,
+        limit: i64,
+        offset: i64,
+    ) -> Result<Vec<history::HistoryEntryData>, String> {
+        self.with_conn(|conn| history::get_reading_history(conn, limit, offset))
     }
 
     pub fn clear_history(&self) -> Result<(), String> {

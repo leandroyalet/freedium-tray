@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { HistoryEntry } from "../types";
 
@@ -9,30 +9,67 @@ type GroupedHistory = {
   entries: HistoryEntry[];
 };
 
+const PAGE_SIZE = 20;
+
 const History = () => {
   const navigate = useNavigate();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    loadHistory();
-  }, []);
+  const loadHistory = useCallback(async (reset = false) => {
+    const offset = reset ? 0 : history.length;
 
-  const loadHistory = async () => {
     try {
-      const data = await invoke<HistoryEntry[]>("get_reading_history");
-      setHistory(data);
+      const data = await invoke<HistoryEntry[]>("get_reading_history", {
+        limit: PAGE_SIZE,
+        offset,
+      });
+
+      if (reset) {
+        setHistory(data);
+      } else {
+        setHistory((prev) => [...prev, ...data]);
+      }
+
+      setHasMore(data.length === PAGE_SIZE);
     } catch (err) {
       console.error("Failed to load history:", err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  };
+  }, [history.length]);
+
+  useEffect(() => {
+    loadHistory(true);
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore && !loading) {
+          setLoadingMore(true);
+          loadHistory(false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, loading, loadHistory]);
 
   const clearHistory = async () => {
     try {
       await invoke("clear_history");
       setHistory([]);
+      setHasMore(false);
     } catch (err) {
       console.error("Failed to clear history:", err);
     }
@@ -146,6 +183,14 @@ const History = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      <div ref={observerTarget} className="h-4" />
+      
+      {loadingMore && (
+        <div className="text-center py-4 text-neutral-500 dark:text-neutral-400">
+          Loading more...
         </div>
       )}
     </div>

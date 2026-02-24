@@ -17,11 +17,15 @@ pub fn add_to_history(
 #[tauri::command]
 pub fn get_reading_history(
     repo: State<'_, Repository>,
+    limit: i64,
+    offset: i64,
 ) -> Result<Vec<db::history::HistoryEntryData>, CommandError> {
-    repo.inner().get_reading_history().map_err(|e| {
-        log_error!("get_reading_history: {}", e);
-        CommandError::internal(&e.to_string())
-    })
+    repo.inner()
+        .get_reading_history(limit, offset)
+        .map_err(|e| {
+            log_error!("get_reading_history: {}", e);
+            CommandError::internal(&e)
+        })
 }
 
 #[tauri::command]
