@@ -4,8 +4,19 @@ use tauri::{TitleBarStyle, WebviewUrl, WebviewWindowBuilder};
 
 use crate::config::JS_INIT_SCRIPT;
 
-pub fn create_main_window(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
-    let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default())
+pub fn create_main_window(
+    app: &tauri::App,
+    initial_url: Option<&str>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let url = match initial_url {
+        Some(url) => {
+            let encoded = url::form_urlencoded::byte_serialize(url.as_bytes()).collect::<String>();
+            format!("index.html#/article?url={}", encoded)
+        }
+        None => "index.html".to_string(),
+    };
+
+    let win_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::App(url.into()))
         .title("Freedium Tray")
         .min_inner_size(585.00, 550.00)
         .inner_size(800.0, 600.0)

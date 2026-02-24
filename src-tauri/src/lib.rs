@@ -12,8 +12,8 @@ mod window;
 
 use std::env;
 
-use tauri::{Emitter, Manager};
-use tray::setup_tray;
+use tauri::Manager;
+use tray::{setup_tray};
 use window::create_main_window;
 
 #[allow(unused_imports)]
@@ -42,13 +42,17 @@ pub fn run() {
 
             let args: Vec<String> = env::args().collect();
 
-            if let Some(url) = args.get(1) {
-                println!("URL recibida: {}", url);
-                app.emit("initial-url", url).unwrap();
-            }
+            let initial_url = args.get(1).map(|url| url.as_str());
 
-            create_main_window(app)?;
+            create_main_window(app, initial_url)?;
             setup_tray(app)?;
+
+            if initial_url.is_some() {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
 
             Ok(())
         })

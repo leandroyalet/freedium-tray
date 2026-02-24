@@ -23,20 +23,14 @@ function AppContent() {
   useWindowNavigation();
   const location = useLocation();
   const [needsConfig, setNeedsConfig] = useState(true);
-  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const checkConfig = async () => {
       const configured = await isMirrorConfigured();
       setNeedsConfig(!configured);
-      setIsReady(true);
     };
     checkConfig();
   }, [location.pathname]);
-
-  if (!isReady) {
-    return null;
-  }
 
   return (
     <>
