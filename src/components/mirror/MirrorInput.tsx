@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { load, Store } from "@tauri-apps/plugin-store";
 
 const STORE_KEY = "mirror";
@@ -21,6 +21,7 @@ const MirrorInput: React.FC<MirrorInputProps> = ({ onSave }) => {
   const [store, setStore] = useState<Store | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const initStore = async () => {
@@ -47,16 +48,28 @@ const MirrorInput: React.FC<MirrorInputProps> = ({ onSave }) => {
     }
   }, [mirror]);
 
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleSave = async () => {
     if (!store || !isValidUrl(mirror)) {
       return;
+    }
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
 
     await store.set(STORE_KEY, mirror);
     await store.save();
 
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    timeoutRef.current = setTimeout(() => setSaved(false), 2000);
     onSave?.();
   };
 

@@ -57,6 +57,13 @@ const ArticleViewer: React.FC<ArticleViewerProps> = ({ article, loading }) => {
 
       pre.appendChild(button);
     });
+
+    return () => {
+      blocks.forEach((pre) => {
+        const btn = pre.querySelector(".hljs-copy");
+        btn?.remove();
+      });
+    };
   }, [article, loading]);
 
   if (loading) {

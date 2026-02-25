@@ -5,7 +5,7 @@ use crate::db::Repository;
 use crate::error::CommandError;
 use crate::scraper;
 
-#[tauri::command]
+#[tauri::command(async)]
 pub async fn import_article_urls(
     _app: tauri::AppHandle,
     repo: State<'_, Repository>,

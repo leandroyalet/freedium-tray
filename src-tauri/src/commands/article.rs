@@ -6,7 +6,7 @@ use crate::error::CommandError;
 use crate::models::ArticleData;
 use crate::scraper;
 
-#[tauri::command]
+#[tauri::command(async)]
 pub async fn fetch_via_proxy(
     _app: tauri::AppHandle,
     repo: State<'_, Repository>,
