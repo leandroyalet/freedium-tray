@@ -92,6 +92,10 @@ impl Repository {
         self.with_conn(|conn| articles::get_popular_tags(conn, limit))
     }
 
+    pub fn search_tags(&self, prefix: &str, limit: i64) -> Result<Vec<String>, String> {
+        self.with_conn(|conn| articles::search_tags(conn, prefix, limit))
+    }
+
     pub fn search_articles_count(&self, query: &str) -> Result<i64, String> {
         self.with_conn(|conn| articles::search_articles_count(conn, query))
     }

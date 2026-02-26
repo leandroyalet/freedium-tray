@@ -59,3 +59,15 @@ pub fn get_popular_tags(
         CommandError::internal(&e.to_string())
     })
 }
+
+#[tauri::command]
+pub fn search_tags(
+    repo: State<'_, Repository>,
+    prefix: String,
+    limit: i64,
+) -> Result<Vec<String>, CommandError> {
+    repo.inner().search_tags(&prefix, limit).map_err(|e| {
+        log_error!("search_tags: {}", e);
+        CommandError::internal(&e.to_string())
+    })
+}

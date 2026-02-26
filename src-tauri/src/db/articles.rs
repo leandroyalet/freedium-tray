@@ -351,6 +351,27 @@ pub fn get_popular_tags(conn: &Connection, limit: i64) -> Result<Vec<TagCount>, 
     Ok(rows.filter_map(Result::ok).collect())
 }
 
+pub fn search_tags(
+    conn: &Connection,
+    prefix: &str,
+    limit: i64,
+) -> Result<Vec<String>, rusqlite::Error> {
+    let prefix = match validate_tag(prefix) {
+        Some(p) => p,
+        None => return Ok(vec![]),
+    };
+
+    let limit = limit.max(1).min(20);
+    let pattern = format!("{}%", prefix);
+
+    let mut stmt =
+        conn.prepare("SELECT name FROM tags WHERE name LIKE ?1 ORDER BY name LIMIT ?2")?;
+
+    let rows = stmt.query_map(params![pattern, limit], |row| row.get(0))?;
+
+    Ok(rows.filter_map(Result::ok).collect())
+}
+
 pub fn search_articles_by_tag(
     conn: &Connection,
     tag: &str,

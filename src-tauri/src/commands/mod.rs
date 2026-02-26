@@ -20,6 +20,7 @@ pub fn all_commands() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool {
         import_article_urls,
         get_article_count,
         get_popular_tags,
+        search_tags,
         add_to_history,
         get_reading_history,
         clear_history,
