@@ -43,8 +43,8 @@ pub async fn fetch_via_proxy(
     }
 }
 
-#[tauri::command]
-pub fn get_article_by_slug(
+#[tauri::command(async)]
+pub async fn get_article_by_slug(
     repo: State<'_, Repository>,
     slug: String,
 ) -> Result<ArticleData, CommandError> {
@@ -54,8 +54,8 @@ pub fn get_article_by_slug(
     })?.ok_or_else(|| CommandError::not_found("Article not found"))
 }
 
-#[tauri::command]
-pub fn delete_article(repo: State<'_, Repository>, slug: String) -> Result<(), CommandError> {
+#[tauri::command(async)]
+pub async fn delete_article(repo: State<'_, Repository>, slug: String) -> Result<(), CommandError> {
     repo.inner().delete_article(&slug).map_err(|e| {
         log_error!("delete_article: {}", e);
         CommandError::internal(&e.to_string())

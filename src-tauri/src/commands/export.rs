@@ -3,8 +3,8 @@ use tauri::State;
 use crate::db::Repository;
 use crate::error::CommandError;
 
-#[tauri::command]
-pub fn export_article_urls(repo: State<'_, Repository>) -> Result<String, CommandError> {
+#[tauri::command(async)]
+pub async fn export_article_urls(repo: State<'_, Repository>) -> Result<String, CommandError> {
     let urls = repo.inner().get_all_urls().map_err(|e| {
         log_error!("export_article_urls: get_all_urls failed: {}", e);
         CommandError::internal(&e.to_string())

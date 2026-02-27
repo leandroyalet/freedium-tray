@@ -3,8 +3,8 @@ use tauri::State;
 use crate::db::{self, Repository};
 use crate::error::CommandError;
 
-#[tauri::command]
-pub fn add_to_history(
+#[tauri::command(async)]
+pub async fn add_to_history(
     repo: State<'_, Repository>,
     article_url: String,
 ) -> Result<i64, CommandError> {
@@ -14,8 +14,8 @@ pub fn add_to_history(
     })
 }
 
-#[tauri::command]
-pub fn get_reading_history(
+#[tauri::command(async)]
+pub async fn get_reading_history(
     repo: State<'_, Repository>,
     limit: i64,
     offset: i64,
@@ -28,8 +28,8 @@ pub fn get_reading_history(
         })
 }
 
-#[tauri::command]
-pub fn clear_history(repo: State<'_, Repository>) -> Result<(), CommandError> {
+#[tauri::command(async)]
+pub async fn clear_history(repo: State<'_, Repository>) -> Result<(), CommandError> {
     repo.inner().clear_history().map_err(|e| {
         log_error!("clear_history: {}", e);
         CommandError::internal(&e.to_string())

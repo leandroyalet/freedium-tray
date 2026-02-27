@@ -4,8 +4,8 @@ use crate::db::{self, Repository};
 use crate::error::CommandError;
 use crate::models::{ArticleSummary, SearchResult};
 
-#[tauri::command]
-pub fn get_recent_articles(
+#[tauri::command(async)]
+pub async fn get_recent_articles(
     repo: State<'_, Repository>,
     limit: i64,
     offset: i64,
@@ -18,8 +18,8 @@ pub fn get_recent_articles(
         })
 }
 
-#[tauri::command]
-pub fn search_articles(
+#[tauri::command(async)]
+pub async fn search_articles(
     repo: State<'_, Repository>,
     query: String,
     limit: i64,
@@ -41,15 +41,15 @@ pub fn search_articles(
     Ok(SearchResult { articles, count })
 }
 
-#[tauri::command]
-pub fn get_article_count(repo: State<'_, Repository>) -> Result<i64, CommandError> {
+#[tauri::command(async)]
+pub async fn get_article_count(repo: State<'_, Repository>) -> Result<i64, CommandError> {
     repo.inner().get_article_count().map_err(|e| {
         log_error!("get_article_count: {}", e);
         CommandError::internal(&e.to_string())
     })
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn get_popular_tags(
     repo: State<'_, Repository>,
     limit: i64,
@@ -60,8 +60,8 @@ pub fn get_popular_tags(
     })
 }
 
-#[tauri::command]
-pub fn search_tags(
+#[tauri::command(async)]
+pub async fn search_tags(
     repo: State<'_, Repository>,
     prefix: String,
     limit: i64,
